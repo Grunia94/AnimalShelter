@@ -21,6 +21,7 @@ def okno1():
     gender = tk.Entry(newWindow, width=30)
     gender.grid(row=5, column=1, padx=20)
 
+
     name_lbl = tk.Label(newWindow, text='Imię', width=30).grid(row=0, column= 0, padx=20)
     species_lbl = tk.Label(newWindow, text='Gatunek', width=30).grid(row=1, column=0, padx=20)
     place_lbl = tk.Label(newWindow,text='Miejsce znalezienia', width=30).grid(row=2, column=0, padx=20)
@@ -68,12 +69,12 @@ except mariadb.Error as e:
 cur = conn.cursor()
 '''
 cur.execute("""CREATE TABLE animals (
-            name = %s,
-            species = %s,
-            place = %s,
-            status = %s,
-            age = %s,
-            gender = %s)
+            name,
+            species,
+            place,
+            status,
+            age,
+            gender)
             """)
 '''
 
@@ -92,54 +93,37 @@ records = {}
 
 
 def petadd():
-    name.delete(0, tk.END)
-    species.delete(0, tk.END)
-    place.delete(0, tk.END)
-    status.delete(0, tk.END)
-    age.delete(0, tk.END)
-    gender.delete(0, tk.END)
 
-    cur.execute("""INSERT INTO animals VALUES ("""name, :species, :place, :status, :age, :gender)""",
-                {
-                    'name': name.get(),
-                    'species': species.get(),
-                    'place': place.get(),
-                    'status': status.get(),
-                    'age': age.get(),
-                    'gender': gender.get()
 
-                }
+    cur.execute("""INSERT INTO animals VALUES (%s,%s,%s,%s,%s,%s)""",
+                (
+                    name.get(),
+                    species.get(),
+                    place.get(),
+                    status.get(),
+                    age.get(),
+                    gender.get()
+                )
 
                 )
 
 
-    ile = len(records.keys())
-    if ile >= 5:
-        okno11()
-    else:
-        v = str(name.get())
-        speciesadd = str(species.get())
-        records[v] = [speciesadd]
-    _SQL = """insert into animals (name,species) values (%s, %s)"""
-    cur.execute(_SQL(v,speciesadd))
+    conn.commit()
+    #    v = str(name.get())
+    #    speciesadd = str(species.get())
+    #    records[v] = [speciesadd]
+    #_SQL = """insert into animals (name,species) values (%s, %s)"""
+    #cur.execute(_SQL(v,speciesadd))
     print(cur.execute("SELECT * FROM ANIMALS"))
-    print(records)
     print("Poprawnie dodano zwierzę.")
 
 
 
 
 def petcheck():
-    print(records)
-    ile = len(records.keys())
-    ile= str(ile)
-    print("Ilość zwierząt w schronisku: " + ile)
-    if int(ile) <5:
-        print("W schronisku jest jeszcze miejsce.")
-    else:
-        print("W schronisku nie ma już wolnych miejsc!!!")
+    print(cur.execute("""SELECT COUNT(name) from animals"""))
+    ile=cur.execute("""SELECT COUNT(name) from animals""")
     return ile
-
 
 def petdel():
     print("Podaj imię zwierzęcia do usunięcia")
